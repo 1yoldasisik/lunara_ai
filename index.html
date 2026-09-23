@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lunara AI - Mistik Yapay Zeka & Astroloji Platformu</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0a0814',
+            spaceDark: '#120d26',
+            spaceCard: 'rgba(23, 17, 48, 0.7)',
+            goldGlow: '#f59e0b',
+            cyanGlow: '#06b6d4',
+            violetGlow: '#8b5cf6',
+            mysticGold: '#dfb15b'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Cinzel', 'Georgia', 'serif']
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'spin-slow': 'spin 30s linear infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'glow': 'glow 3s ease-in-out infinite alternate',
+            'scan': 'scan 2.5s linear infinite'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' }
+            },
+            glow: {
+              '0%': { boxShadow: '0 0 15px rgba(223, 177, 91, 0.2)' },
+              '100%': { boxShadow: '0 0 30px rgba(139, 92, 246, 0.5), 0 0 10px rgba(6, 182, 212, 0.4)' }
+            },
+            scan: {
+              '0%': { top: '0%' },
+              '100%': { top: '100%' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0814; }
+    ::-webkit-scrollbar-thumb { background: #2a1f4d; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+    /* Glassmorphism */
+    .glass-panel {
+      background: rgba(18, 13, 38, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(223, 177, 91, 0.15);
+    }
+
+    .glass-card {
+      background: rgba(27, 20, 56, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(223, 177, 91, 0.4);
+      box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fff2cb 0%, #dfb15b 50%, #9a6d20 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* 3D Card Flip CSS */
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+
+    /* Canvas */
+    #star-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body class="bg-obsidian text-slate-100 font-sans min-h-screen overflow-x-hidden relative selection:bg-violet-600 selection:text-white">
+
+  <!-- Background Starfield Animation -->
+  <canvas id="star-canvas"></canvas>
+
+  <!-- Navigation Header -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-amber-500/10 px-4 lg:px-8 py-3.5 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Logo -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('horoscope')">
+        <div class="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-purple-900 via-indigo-950 to-amber-500/20 p-[1px] shadow-lg shadow-purple-950/50">
+          <div class="w-full h-full bg-obsidian rounded-full flex items-center justify-center">
+            <i data-lucide="moon" class="w-5 h-5 text-amber-400 fill-amber-400/20"></i>
+          </div>
+          <span class="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+          </span>
+        </div>
+        <div>
+          <span class="font-serif text-2xl font-bold tracking-wider gold-gradient-text">LUNARA</span>
+          <span class="text-xs font-semibold uppercase tracking-widest text-cyan-400 ml-1.5 px-1.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30">AI</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links (Desktop) -->
+      <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 bg-spaceDark/80 p-1.5 rounded-full border border-purple-500/20">
+        <button onclick="switchTab('birthchart')" id="nav-birthchart" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white transition flex items-center gap-2">
+          <i data-lucide="compass" class="w-4 h-4 text-amber-400"></i> Doğum Haritası
+        </button>
+        <button onclick="switchTab('tarot')" id="nav-tarot" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white transition flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i> Tarot Falı
+        </button>
+        <button onclick="switchTab('coffee')" id="nav-coffee" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white transition flex items-center gap-2">
+          <i data-lucide="coffee" class="w-4 h-4 text-amber-600"></i> Kahve Falı
+        </button>
+        <button onclick="switchTab('horoscope')" id="nav-horoscope" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white transition flex items-center gap-2 active bg-purple-900/50 border border-purple-500/30 text-white">
+          <i data-lucide="sun" class="w-4 h-4 text-cyan-400"></i> Burçlar
+        </button>
+        <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn px-4 py-2 rounded-full text-sm font-medium text-slate-300 hover:text-white transition flex items-center gap-2">
+          <i data-lucide="bot" class="w-4 h-4 text-emerald-400"></i> AI Rehber
+        </button>
+      </nav>
+
+      <!-- User Action & Auth State -->
+      <div class="flex items-center space-x-3">
+        <!-- Guest View Buttons -->
+        <div id="guest-actions" class="flex items-center space-x-2">
+          <button onclick="openAuthModal('login')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition border border-white/10">
+            Giriş Yap
+          </button>
+          <button onclick="openAuthModal('register')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-obsidian bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-90 transition shadow-md shadow-amber-500/20">
+            Üye Ol
+          </button>
+        </div>
+
+        <!-- Logged-in User View -->
+        <div id="user-actions" class="hidden flex items-center space-x-3">
+          <button onclick="openTokenModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-amber-500/20 transition">
+            <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span id="token-count">15 Kredi</span>
+          </button>
+          
+          <div class="relative group">
+            <button onclick="openProfileModal()" class="flex items-center gap-2 p-1.5 pl-2.5 rounded-full glass-card hover:bg-purple-900/40 border border-purple-500/30 transition">
+              <span id="header-user-name" class="text-xs font-semibold text-amber-200">Selin Y.</span>
+              <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                <i data-lucide="user" class="w-4 h-4"></i>
+              </div>
+            </button>
+          </div>
+
+          <button onclick="logoutUser()" title="Çıkış Yap" class="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-purple-500/20 px-2 py-2 flex justify-around items-center bg-obsidian/95">
+      <button onclick="switchTab('birthchart')" id="mobile-nav-birthchart" class="mobile-nav-btn flex flex-col items-center p-1.5 text-xs text-slate-400">
+        <i data-lucide="compass" class="w-5 h-5 mb-0.5"></i>
+        <span>Harita</span>
+      </button>
+      <button onclick="switchTab('tarot')" id="mobile-nav-tarot" class="mobile-nav-btn flex flex-col items-center p-1.5 text-xs text-slate-400">
+        <i data-lucide="sparkles" class="w-5 h-5 mb-0.5"></i>
+        <span>Tarot</span>
+      </button>
+      <button onclick="switchTab('coffee')" id="mobile-nav-coffee" class="mobile-nav-btn flex flex-col items-center p-1.5 text-xs text-slate-400">
+        <i data-lucide="coffee" class="w-5 h-5 mb-0.5"></i>
+        <span>Kahve</span>
+      </button>
+      <button onclick="switchTab('horoscope')" id="mobile-nav-horoscope" class="mobile-nav-btn flex flex-col items-center p-1.5 text-xs text-cyan-400 font-semibold">
+        <i data-lucide="sun" class="w-5 h-5 mb-0.5"></i>
+        <span>Burç</span>
+      </button>
+      <button onclick="switchTab('chat')" id="mobile-nav-chat" class="mobile-nav-btn flex flex-col items-center p-1.5 text-xs text-slate-400">
+        <i data-lucide="bot" class="w-5 h-5 mb-0.5"></i>
+        <span>Rehber</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-12">
+
+    <!-- TAB 1: DOĞUM HARİTASI -->
+    <section id="tab-birthchart" class="tab-content hidden space-y-8 animate-fadeIn">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/40 border border-purple-500/30 text-xs font-semibold text-purple-300">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Swiss Ephemeris & AI Destekli
+        </div>
+        <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight gold-gradient-text">Yapay Zeka Doğum Haritası</h1>
+        <p class="text-slate-400 text-sm sm:text-base">Gökyüzünün doğduğunuz andaki eşsiz konumunu yüksek hassasiyetle hesaplayın, potansiyelinizi ve kadersel döngülerinizi keşfedin.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="lg:col-span-5 glass-panel p-6 sm:p-8 rounded-3xl space-y-6 relative overflow-hidden">
+          <div class="absolute -right-12 -top-12 w-40 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+          <h2 class="font-serif text-xl font-semibold text-amber-200 flex items-center gap-2">
+            <i data-lucide="user-check" class="w-5 h-5 text-amber-400"></i> Doğum Bilgileriniz
+          </h2>
+
+          <form id="birth-form" onsubmit="calculateBirthChart(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Tam Adınız</label>
+              <input type="text" id="chart-name" required value="Selin Yılmaz" class="w-full bg-spaceDark/90 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Doğum Tarihi</label>
+                <input type="date" id="chart-date" required value="1998-05-14" class="w-full bg-spaceDark/90 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Doğum Saati</label>
+                <input type="time" id="chart-time" required value="14:30" class="w-full bg-spaceDark/90 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Doğum Yeri (Şehir / Ülke)</label>
+              <div class="relative">
+                <input type="text" id="chart-location" required value="İstanbul, Türkiye" class="w-full bg-spaceDark/90 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition pl-10">
+                <i data-lucide="map-pin" class="w-4 h-4 text-purple-400 absolute left-3.5 top-3"></i>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 font-semibold text-white shadow-lg shadow-purple-900/40 hover:shadow-purple-700/60 hover:opacity-95 transition flex items-center justify-center gap-2 group">
+                <i data-lucide="sparkles" class="w-5 h-5 text-amber-300 group-hover:rotate-12 transition-transform"></i>
+                <span>Haritayı Hesapla ve Yorumla</span>
+              </button>
+            </div>
+          </form>
+
+          <div class="pt-4 border-t border-white/5 space-y-2">
+            <span class="text-xs text-slate-400 block">Örnek Ünlü Haritaları:</span>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="fillBirthChartPreset('Albert Einstein', '1879-03-14', '11:30', 'Ulm, Almanya')" class="text-xs px-2.5 py-1 rounded-lg bg-white/5 hover:bg-purple-900/30 text-slate-300 hover:text-amber-300 border border-white/5 transition">Einstein</button>
+              <button onclick="fillBirthChartPreset('Frida Kahlo', '1907-07-06', '08:30', 'Coyoacán, Meksika')" class="text-xs px-2.5 py-1 rounded-lg bg-white/5 hover:bg-purple-900/30 text-slate-300 hover:text-amber-300 border border-white/5 transition">Frida Kahlo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 space-y-6">
+          <div class="glass-panel p-6 rounded-3xl flex flex-col items-center justify-center min-h-[420px] relative">
+            <div class="flex items-center justify-between w-full mb-4">
+              <h3 class="font-serif text-lg font-semibold text-slate-200" id="chart-display-title">Gök Günlüğü Çarkı</h3>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20" id="chart-display-sub">Placidus Ev Sistemi</span>
+            </div>
+
+            <div class="relative w-full max-w-[360px] aspect-square flex items-center justify-center my-2">
+              <svg id="astro-wheel-svg" viewBox="0 0 400 400" class="w-full h-full drop-shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-transform duration-700">
+                <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(223, 177, 91, 0.2)" stroke-width="2" />
+                <circle cx="200" cy="200" r="145" fill="none" stroke="rgba(139, 92, 246, 0.3)" stroke-width="1.5" />
+                <circle cx="200" cy="200" r="95" fill="none" stroke="rgba(6, 182, 212, 0.25)" stroke-width="1" />
+                
+                <circle cx="200" cy="200" r="25" fill="#0a0814" stroke="#dfb15b" stroke-width="1.5" />
+                <text x="200" y="204" font-family="Cinzel" font-size="11" fill="#dfb15b" text-anchor="middle">LUNARA</text>
+
+                <g stroke="rgba(255, 255, 255, 0.12)" stroke-width="1" id="house-lines">
+                  <line x1="20" y1="200" x2="380" y2="200" stroke="rgba(239, 68, 68, 0.6)" stroke-width="2" />
+                  <line x1="200" y1="20" x2="200" y2="380" stroke="rgba(59, 130, 246, 0.6)" stroke-width="2" />
+                  <line x1="60" y1="120" x2="340" y2="280" />
+                  <line x1="120" y1="60" x2="280" y2="340" />
+                  <line x1="280" y1="60" x2="120" y2="340" />
+                  <line x1="340" y1="120" x2="60" y2="280" />
+                </g>
+
+                <g font-size="14" fill="#dfb15b" text-anchor="middle" dominant-baseline="central">
+                  <text x="370" y="200">♈</text>
+                  <text x="345" y="115">♉</text>
+                  <text x="285" y="55">♊</text>
+                  <text x="200" y="30">♋</text>
+                  <text x="115" y="55">♌</text>
+                  <text x="55" y="115">♍</text>
+                  <text x="30" y="200">♎</text>
+                  <text x="55" y="285">♏</text>
+                  <text x="115" y="345">♐</text>
+                  <text x="200" y="370">♑</text>
+                  <text x="285" y="345">♒</text>
+                  <text x="345" y="285">♓</text>
+                </g>
+
+                <g id="planet-nodes">
+                  <g transform="translate(320, 150)" class="cursor-pointer group" onclick="showPlanetInfo('Güneş', 'Boğa 23°', '10. Ev', 'Kariyerinizde kararlılık, somut başarı arzusu ve yüksek estetik değerler ön planda.')">
+                    <circle r="12" fill="#120d26" stroke="#f59e0b" stroke-width="1.5" />
+                    <text font-size="12" fill="#f59e0b" text-anchor="middle" dominant-baseline="central">☉</text>
+                  </g>
+                  <g transform="translate(130, 90)" class="cursor-pointer group" onclick="showPlanetInfo('Ay', 'Yengeç 12°', '12. Ev', 'Derin duygusal sezgiler, güçlü koruma içgüdüsü ve empati yeteneği.')">
+                    <circle r="12" fill="#120d26" stroke="#38bdf8" stroke-width="1.5" />
+                    <text font-size="12" fill="#38bdf8" text-anchor="middle" dominant-baseline="central">☽</text>
+                  </g>
+                  <g transform="translate(45, 200)" class="cursor-pointer group" onclick="showPlanetInfo('Yükselen (ASC)', 'Başak 04°', '1. Ev', 'Analitik yaklaşım, detaylara verilen özen ve düzenli yaşam arzusu.')">
+                    <circle r="12" fill="#120d26" stroke="#10b981" stroke-width="1.5" />
+                    <text font-size="10" font-weight="bold" fill="#10b981" text-anchor="middle" dominant-baseline="central">ASC</text>
+                  </g>
+                </g>
+              </svg>
+            </div>
+
+            <p class="text-xs text-slate-400 mt-2 text-center">Detaylı açı ve ev yorumunu incelemek için çarktaki gezegen sembollerine tıklayın.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="chart-quick-stats">
+            <div class="glass-card p-4 rounded-2xl flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg">☉</div>
+              <div>
+                <span class="text-xs text-slate-400 block">Güneş Burcu</span>
+                <span class="font-semibold text-sm text-slate-100" id="stat-sun">Boğa (23°)</span>
+              </div>
+            </div>
+            <div class="glass-card p-4 rounded-2xl flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-lg">☽</div>
+              <div>
+                <span class="text-xs text-slate-400 block">Ay Burcu</span>
+                <span class="font-semibold text-sm text-slate-100" id="stat-moon">Yengeç (12°)</span>
+              </div>
+            </div>
+            <div class="glass-card p-4 rounded-2xl flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg">↑</div>
+              <div>
+                <span class="text-xs text-slate-400 block">Yükselen Burç</span>
+                <span class="font-semibold text-sm text-slate-100" id="stat-asc">Başak (04°)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-panel p-6 rounded-3xl space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-serif text-lg font-semibold gold-gradient-text flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i> Lunara AI Astro-Sentez Analizi
+              </h4>
+            </div>
+            <p class="text-sm text-slate-300 leading-relaxed" id="chart-ai-summary">
+              Güneşinizin Boğa burcunda ve Ayınızın Yengeç burcunda konumlanması, hayatınızda güven, maddi stabilite ve derin ailevi bağların hayati rol oynadığını gösteriyor. Yükselen Başak etkisi zihninize keskin bir analitik güç ve pratik çözüm yeteneği katıyor.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: TAROT FALI -->
+    <section id="tab-tarot" class="tab-content hidden space-y-8 animate-fadeIn">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/40 border border-purple-500/30 text-xs font-semibold text-purple-300">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Kuantum Rastlantısallık & AI Yorumlama
+        </div>
+        <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight gold-gradient-text">Mistik Tarot Açılımı</h1>
+        <p class="text-slate-400 text-sm sm:text-base">Zihninizi odaklayın, sorunuzu niyet edin ve kartların bilgelik dolu rehberliğine teslim olun.</p>
+      </div>
+
+      <div class="flex justify-center gap-3 max-w-md mx-auto">
+        <button onclick="setTarotSpread(3)" id="spread-btn-3" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-purple-600 text-white border border-amber-400/30 shadow-lg transition">
+          Üç Kart (Geçmiş - Şimdi - Gelecek)
+        </button>
+        <button onclick="setTarotSpread(1)" id="spread-btn-1" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold bg-spaceDark border border-white/10 text-slate-300 hover:border-purple-500/40 transition">
+          Tek Kart (Günün Rehberi)
+        </button>
+      </div>
+
+      <div class="glass-panel p-8 rounded-3xl space-y-8 text-center relative overflow-hidden">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+          <span id="tarot-instruction-text">Lütfen desteden 3 kart seçin</span>
+          <button onclick="resetTarotDeck()" class="text-amber-400 hover:underline flex items-center gap-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Desteyi Yeniden Karıştır
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto min-h-[340px]" id="tarot-cards-container">
+          <!-- Dynamically generated tarot cards -->
+        </div>
+
+        <div id="tarot-reading-result" class="hidden glass-card p-6 rounded-2xl border-amber-500/30 text-left space-y-4 animate-fadeIn">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 class="font-serif text-lg font-semibold text-amber-300 flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-5 h-5 text-purple-400"></i> AI Tarot Analizi ve Rehberliği
+            </h3>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/20">Tam Sentez</span>
+          </div>
+          <p class="text-sm text-slate-200 leading-relaxed" id="tarot-reading-text">
+            Seçtiğiniz kartlar dönüm noktasında olduğunuzu işaret ediyor. Geçmişteki tecrübeleriniz şimdiki içsel gücünüzü besliyor. Gelecekte sizi bekleyen fırsatlar için cesur adımlar atmalısınız.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: KAHVE FALI -->
+    <section id="tab-coffee" class="tab-content hidden space-y-8 animate-fadeIn">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-900/40 border border-amber-500/30 text-xs font-semibold text-amber-300">
+          <i data-lucide="scan" class="w-3.5 h-3.5 text-amber-400"></i> Görsel AI Desen Algılama
+        </div>
+        <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight gold-gradient-text">Yapay Zeka Kahve Falı</h1>
+        <p class="text-slate-400 text-sm sm:text-base">Fincanınızın veya tabağınızın fotoğrafını yükleyin; Lunara AI sembolleri, motifleri ve telve çizgilerini anında analiz etsin.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="lg:col-span-6 glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+          <h2 class="font-serif text-xl font-semibold text-amber-200 flex items-center gap-2">
+            <i data-lucide="camera" class="w-5 h-5 text-amber-400"></i> Fincan Fotoğrafı
+          </h2>
+
+          <div id="drop-zone" class="relative border-2 border-dashed border-purple-500/30 hover:border-amber-400/60 rounded-2xl p-8 text-center bg-spaceDark/50 transition cursor-pointer group flex flex-col items-center justify-center min-h-[280px]" onclick="document.getElementById('coffee-input').click()">
+            <input type="file" id="coffee-input" accept="image/*" class="hidden" onchange="handleCoffeeImageUpload(event)">
+            
+            <div id="upload-placeholder" class="space-y-3 flex flex-col items-center">
+              <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">Fotoğraf Yüklemek İçin Tıklayın</p>
+                <p class="text-xs text-slate-400 mt-1">PNG, JPG, WEBP (Max 10MB)</p>
+              </div>
+            </div>
+
+            <div id="coffee-preview-container" class="hidden relative w-full h-64 rounded-xl overflow-hidden">
+              <img id="coffee-preview-img" src="" alt="Fincan Görseli" class="w-full h-full object-cover">
+              <div id="scanner-line" class="hidden absolute left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-amber-400 to-purple-500 shadow-[0_0_15px_#06b6d4] animate-scan"></div>
+            </div>
+          </div>
+
+          <button onclick="analyzeCoffee()" id="btn-analyze-coffee" disabled class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-600 via-purple-600 to-indigo-600 font-semibold text-white shadow-lg opacity-50 cursor-not-allowed transition flex items-center justify-center gap-2">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i>
+            <span>Fincanı Yapay Zeka ile Analiz Et</span>
+          </button>
+        </div>
+
+        <div class="lg:col-span-6 space-y-6">
+          <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-6 min-h-[400px]">
+            <h3 class="font-serif text-xl font-semibold gold-gradient-text flex items-center gap-2">
+              <i data-lucide="file-text" class="w-5 h-5 text-amber-400"></i> Kahve Falı Yorumu
+            </h3>
+            <div id="coffee-result-container" class="space-y-4 text-slate-300 text-sm">
+              <div class="p-8 text-center text-slate-500 space-y-3">
+                <i data-lucide="coffee" class="w-12 h-12 mx-auto text-purple-900/60"></i>
+                <p>Henüz analiz yapılmadı. Sol taraftan bir fincan görseli yükleyin ve analizi başlatın.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: BURÇLAR -->
+    <section id="tab-horoscope" class="tab-content space-y-8 animate-fadeIn">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/40 border border-cyan-500/30 text-xs font-semibold text-cyan-300">
+          <i data-lucide="sun" class="w-3.5 h-3.5 text-cyan-400"></i> Günlük Transit Analizleri
+        </div>
+        <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight gold-gradient-text">Günlük Burç Yorumları</h1>
+        <p class="text-slate-400 text-sm sm:text-base">Gezegenlerin güncel konumlarına göre burcunuzun aldığı kozmik etkileri ve tavsiyeleri inceleyin.</p>
+      </div>
+
+      <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4 max-w-5xl mx-auto" id="zodiac-grid">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div id="horoscope-detail-card" class="glass-panel p-6 sm:p-8 rounded-3xl space-y-6 max-w-4xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-purple-600/30 border border-amber-400/40 flex items-center justify-center text-3xl" id="selected-zodiac-icon">
+              ♈
+            </div>
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-amber-200" id="selected-zodiac-name">Koç Burcu</h2>
+              <span class="text-xs text-slate-400" id="selected-zodiac-date">21 Mart - 19 Nisan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <h4 class="font-serif text-base font-semibold text-slate-200">Günlük Kozmik Yorum</h4>
+          <p class="text-sm text-slate-300 leading-relaxed" id="zodiac-main-text">
+            Bugün yönetici gezegeniniz Mars'ın olumlu açısı sayesinde yüksek bir motivasyonla güne başlıyorsunuz. Ertelediğiniz işleri tamamlamak ve radikal kararlar almak için oldukça elverişli bir zamandasınız.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: AI CHAT REHBERİ -->
+    <section id="tab-chat" class="tab-content hidden space-y-6 animate-fadeIn">
+      <div class="text-center max-w-3xl mx-auto space-y-2">
+        <h1 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight gold-gradient-text">Lunara AI Mistik Danışman</h1>
+        <p class="text-slate-400 text-sm">Astroloji, rüya tabirleri, tarot ve ruhsal rehberlik hakkında aklınıza takılan her şeyi sorun.</p>
+      </div>
+
+      <div class="glass-panel rounded-3xl max-w-4xl mx-auto overflow-hidden flex flex-col h-[550px]">
+        <div class="p-4 bg-spaceDark/90 border-b border-purple-500/20 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-amber-400 flex items-center justify-center text-white">
+              <i data-lucide="bot" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-sm text-slate-100">Lunara AI Rehber</h3>
+              <span class="text-[10px] text-emerald-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Çevrimiçi
+              </span>
+            </div>
+          </div>
+          <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-amber-300 transition">Temizle</button>
+        </div>
+
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-purple-900/60 border border-purple-500/30 flex items-center justify-center text-amber-300 flex-shrink-0">
+              <i data-lucide="bot" class="w-4 h-4"></i>
+            </div>
+            <div class="glass-card p-3.5 rounded-2xl rounded-tl-none max-w-[80%] text-slate-200 leading-relaxed">
+              Selamlar! Ben Lunara AI. Yıldızların haritanızdaki konumları, rüyalarınızın gizli sembolleri veya ruhsal yolculuğunuz hakkında ne öğrenmek istersiniz?
+            </div>
+          </div>
+        </div>
+
+        <form onsubmit="handleChatSubmit(event)" class="p-3 bg-spaceDark/90 border-t border-purple-500/20 flex gap-2">
+          <input type="text" id="chat-input" placeholder="Mistik rehberinize bir soru sorun..." class="flex-1 bg-obsidian/80 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-purple-600 font-semibold text-white hover:opacity-90 transition flex items-center gap-1">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: GİRİŞ YAP & ÜYE OL -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 border-amber-500/30 relative transform scale-95 transition-transform duration-300" id="auth-modal-card">
+      
+      <!-- Close Button -->
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Auth Header Tabs -->
+      <div class="flex items-center justify-center border-b border-white/10 pb-4">
+        <div class="flex bg-spaceDark p-1 rounded-xl border border-white/10 w-full">
+          <button id="auth-tab-login" onclick="toggleAuthTab('login')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-white bg-purple-900/60 transition">
+            Giriş Yap
+          </button>
+          <button id="auth-tab-register" onclick="toggleAuthTab('register')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+            Üye Ol
+          </button>
+        </div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">E-Posta Adresi</label>
+          <input type="email" id="login-email" required placeholder="ornek@lunara.ai" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Şifre</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded bg-spaceDark border-purple-500/30 text-amber-500 focus:ring-0">
+            <span>Beni Hatırla</span>
+          </label>
+          <a href="#" onclick="alert('Şifre sıfırlama bağlantısı e-postanıza gönderildi.')" class="hover:text-amber-300 transition">Şifremi Unuttum?</a>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-purple-600 font-semibold text-white shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Giriş Yap</span>
+        </button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Ad Soyad</label>
+          <input type="text" id="reg-name" required placeholder="Selin Yılmaz" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">E-Posta Adresi</label>
+          <input type="email" id="reg-email" required placeholder="ornek@lunara.ai" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Şifre Oluştur</label>
+          <input type="password" id="reg-password" required minlength="6" placeholder="En az 6 karakter" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+        <div class="text-[11px] text-slate-400 leading-tight">
+          Kaydol butonuna basarak <a href="#" class="text-amber-400 hover:underline">Kullanım Koşulları</a> ve <a href="#" class="text-amber-400 hover:underline">Gizlilik Sözleşmesi</a>'ni kabul etmiş olursunuz.
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 font-semibold text-white shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>Hesap Oluştur</span>
+        </button>
+      </form>
+
+      <!-- Social Login Options -->
+      <div class="pt-2 border-t border-white/10 space-y-3">
+        <span class="text-[11px] text-slate-400 text-center block">Veya şununla devam et:</span>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="handleSocialAuth('Google')" class="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-slate-200 transition flex items-center justify-center gap-2">
+            <span>Google</span>
+          </button>
+          <button onclick="handleSocialAuth('Apple')" class="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-slate-200 transition flex items-center justify-center gap-2">
+            <span>Apple ID</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: KULLANICI PROFİL VE GÜVENLİK YÖNETİMİ PANELİ -->
+  <div id="profile-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 border-amber-500/30 relative transform scale-95 transition-transform duration-300" id="profile-modal-card">
+      
+      <!-- Close Button -->
+      <button onclick="closeProfileModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Profile Header -->
+      <div class="flex items-center gap-4 border-b border-white/10 pb-4">
+        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 to-purple-600 p-[2px] shadow-lg">
+          <div class="w-full h-full bg-obsidian rounded-full flex items-center justify-center text-amber-300 font-bold text-xl" id="profile-avatar-char">
+            S
+          </div>
+        </div>
+        <div>
+          <h3 class="font-serif text-xl font-bold gold-gradient-text" id="profile-display-name">Selin Yılmaz</h3>
+          <p class="text-xs text-slate-400" id="profile-display-email">selin@example.com</p>
+        </div>
+      </div>
+
+      <!-- Tab Switchers for Profile Panel -->
+      <div class="flex bg-spaceDark p-1 rounded-xl border border-white/10 w-full">
+        <button id="psection-tab-info" onclick="switchProfileSection('info')" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-white bg-purple-900/60 transition">
+          Profil Bilgileri
+        </button>
+        <button id="psection-tab-security" onclick="switchProfileSection('security')" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+          Güvenlik & Şifre
+        </button>
+      </div>
+
+      <!-- SECTION 1: PROFiL BİLGİLERİ (Biyografi ve Burç) -->
+      <form id="profile-info-form" onsubmit="saveProfileInfo(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Burcunuz</label>
+          <select id="profile-zodiac-select" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+            <option value="Boğa ♉">Boğa ♉</option>
+            <option value="Koç ♈">Koç ♈</option>
+            <option value="İkizler ♊">İkizler ♊</option>
+            <option value="Yengeç ♋">Yengeç ♋</option>
+            <option value="Aslan ♌">Aslan ♌</option>
+            <option value="Başak ♍">Başak ♍</option>
+            <option value="Terazi ♎">Terazi ♎</option>
+            <option value="Akrep ♏">Akrep ♏</option>
+            <option value="Yay ♐">Yay ♐</option>
+            <option value="Oğlak ♑">Oğlak ♑</option>
+            <option value="Kova ♒">Kova ♒</option>
+            <option value="Balık ♓">Balık ♓</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Mistik Biyografi</label>
+          <textarea id="profile-bio-input" rows="3" placeholder="Kendiniz, ruhsal yolculuğunuz veya ilgi alanlarınız hakkında kısa bir not yazın..." class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition resize-none"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-purple-600 font-semibold text-xs text-white shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+          <i data-lucide="save" class="w-4 h-4"></i>
+          <span>Profil Bilgilerini Kaydet</span>
+        </button>
+      </form>
+
+      <!-- SECTION 2: ŞİFRE DEĞİŞTİRME -->
+      <form id="profile-security-form" onsubmit="changeUserPassword(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Mevcut Şifre</label>
+          <input type="password" id="pass-current" required placeholder="••••••••" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Yeni Şifre</label>
+          <input type="password" id="pass-new" required minlength="6" placeholder="En az 6 karakter" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Yeni Şifre (Tekrar)</label>
+          <input type="password" id="pass-confirm" required minlength="6" placeholder="Yeni şifreyi tekrar girin" class="w-full bg-spaceDark border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400/60 transition">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 font-semibold text-xs text-white shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+          <i data-lucide="key-round" class="w-4 h-4"></i>
+          <span>Şifreyi Güncelle</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Universal Modal System -->
+  <div id="universal-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-5 border-amber-500/30 transform scale-95 transition-transform duration-300 relative" id="modal-container">
+      <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <h3 class="font-serif text-xl font-bold gold-gradient-text" id="modal-title">Modal Başlık</h3>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed" id="modal-body">
+        Modal içeriği buraya gelecek...
+      </div>
+      <div class="flex justify-end pt-2">
+        <button onclick="closeModal()" class="px-5 py-2 rounded-xl bg-purple-900/50 hover:bg-purple-800/60 text-xs font-semibold text-purple-200 border border-purple-500/30 transition">
+          Kapat
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Token Modal -->
+  <div id="token-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 space-y-6 border-amber-500/30 relative">
+      <button onclick="closeTokenModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center mx-auto text-amber-400">
+          <i data-lucide="coins" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-serif text-2xl font-bold gold-gradient-text">Mistik Kredi Yükle</h3>
+        <p class="text-xs text-slate-400">Lunara AI ile sınırsız astroloji ve tarot analizi yapabilmek için kredi paketi seçin.</p>
+      </div>
+
+      <div class="space-y-3">
+        <div class="glass-card p-4 rounded-2xl flex items-center justify-between hover:border-amber-400/60 cursor-pointer transition" onclick="addTokens(50); closeTokenModal();">
+          <div>
+            <div class="font-semibold text-sm text-slate-100">50 Kozmik Kredi</div>
+            <div class="text-xs text-slate-400">5 Detaylı Fal Analizi</div>
+          </div>
+          <span class="text-sm font-bold text-amber-400">₺49.99</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC JS -->
+  <script>
+    // --- Application State ---
+    let currentUser = null; 
+    let userTokens = 15;
+    let currentSpreadCount = 3;
+    let selectedTarotCards = [];
+
+    const zodiacData = [
+      { id: 'aries', name: 'Koç', symbol: '♈', date: '21 Mart - 19 Nisan', main: 'Bugün yönetici gezegeniniz Mars\'ın olumlu açısı sayesinde yüksek bir motivasyonla güne başlıyorsunuz.' },
+      { id: 'taurus', name: 'Boğa', symbol: '♉', date: '20 Nisan - 20 Mayıs', main: 'Venüs etkisindeki gününüz size estetik, konfor ve finansal fırsatlar getiriyor.' },
+      { id: 'gemini', name: 'İkizler', symbol: '♊', date: '21 Mayıs - 20 Haziran', main: 'Merkür hareketi fikir trafiğinizi hızlandırıyor.' },
+      { id: 'cancer', name: 'Yengeç', symbol: '♋', date: '21 Haziran - 22 Temmuz', main: 'Ay transiti duygusal hassasiyetinizi artırıyor.' },
+      { id: 'leo', name: 'Aslan', symbol: '♌', date: '23 Temmuz - 22 Ağustos', main: 'Güneş ışığınızı parlatıyor. Sahneye çıkma zamanı.' },
+      { id: 'virgo', name: 'Başak', symbol: '♍', date: '23 Ağustos - 22 Eylül', main: 'Analitik gücünüz sayesinde karmaşık sorunları kolayca çözüyorsunuz.' }
+    ];
+
+    const tarotDeckData = [
+      { name: 'Joker (0)', icon: '✨', meaning: 'Yeni başlangıçlar, masumiyet, potansiyel.' },
+      { name: 'Büyücü (I)', icon: '🪄', meaning: 'Beceri, tezahür ettirme gücü, odaklanma.' },
+      { name: 'Azize (II)', icon: '🌙', meaning: 'Sezgi, gizem, içsel bilgelik.' },
+      { name: 'Kule (XVI)', icon: '⚡', meaning: 'Ani değişim, uyanış, yenilenme.' },
+      { name: 'Yıldız (XVII)', icon: '⭐', meaning: 'Umut, ilham, ruhsal şifa.' }
+    ];
+
+    // --- Authentication Logic ---
+    function openAuthModal(mode = 'login') {
+      const modal = document.getElementById('auth-modal');
+      const card = document.getElementById('auth-modal-card');
+      toggleAuthTab(mode);
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      const card = document.getElementById('auth-modal-card');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    function toggleAuthTab(tab) {
+      const loginTabBtn = document.getElementById('auth-tab-login');
+      const regTabBtn = document.getElementById('auth-tab-register');
+      const loginForm = document.getElementById('login-form');
+      const regForm = document.getElementById('register-form');
+
+      if (tab === 'login') {
+        loginTabBtn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-white bg-purple-900/60 transition';
+        regTabBtn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+      } else {
+        regTabBtn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-white bg-purple-900/60 transition';
+        loginTabBtn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+        regForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const userName = email.split('@')[0];
+      
+      currentUser = {
+        name: userName.charAt(0).toUpperCase() + userName.slice(1),
+        email: email,
+        zodiac: 'Boğa ♉',
+        bio: 'Gökyüzü ile uyum içinde bir gezgin.'
+      };
+
+      onUserAuthenticated();
+      closeAuthModal();
+      alert(`Hoş geldiniz, ${currentUser.name}! Giriş başarıyla yapıldı.`);
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value;
+      const email = document.getElementById('reg-email').value;
+
+      currentUser = {
+        name: name,
+        email: email,
+        zodiac: 'Koç ♈',
+        bio: 'Lunara AI evrenine yeni katıldım.'
+      };
+      
+      onUserAuthenticated();
+      closeAuthModal();
+      alert(`Hesabınız başarıyla oluşturuldu! Hoş geldiniz, ${currentUser.name}.`);
+    }
+
+    function handleSocialAuth(provider) {
+      currentUser = {
+        name: `${provider} Kullanıcısı`,
+        email: `user@${provider.toLowerCase()}.com`,
+        zodiac: 'Boğa ♉',
+        bio: 'Sosyal medya hesabı ile katıldı.'
+      };
+      onUserAuthenticated();
+      closeAuthModal();
+      alert(`${provider} ile hızlı giriş yapıldı!`);
+    }
+
+    function onUserAuthenticated() {
+      document.getElementById('guest-actions').classList.add('hidden');
+      document.getElementById('user-actions').classList.remove('hidden');
+      document.getElementById('header-user-name').innerText = currentUser.name;
+
+      const chartNameInput = document.getElementById('chart-name');
+      if (chartNameInput) chartNameInput.value = currentUser.name;
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      document.getElementById('guest-actions').classList.remove('hidden');
+      document.getElementById('user-actions').classList.add('hidden');
+      alert('Oturum kapatıldı.');
+    }
+
+    // --- Profile & Security Modal Functions ---
+    function openProfileModal() {
+      if (!currentUser) return;
+
+      document.getElementById('profile-avatar-char').innerText = currentUser.name.charAt(0).toUpperCase();
+      document.getElementById('profile-display-name').innerText = currentUser.name;
+      document.getElementById('profile-display-email').innerText = currentUser.email;
+
+      document.getElementById('profile-zodiac-select').value = currentUser.zodiac || 'Boğa ♉';
+      document.getElementById('profile-bio-input').value = currentUser.bio || '';
+
+      switchProfileSection('info');
+
+      const modal = document.getElementById('profile-modal');
+      const card = document.getElementById('profile-modal-card');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeProfileModal() {
+      const modal = document.getElementById('profile-modal');
+      const card = document.getElementById('profile-modal-card');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    function switchProfileSection(sec) {
+      const infoTabBtn = document.getElementById('psection-tab-info');
+      const secTabBtn = document.getElementById('psection-tab-security');
+      const infoForm = document.getElementById('profile-info-form');
+      const secForm = document.getElementById('profile-security-form');
+
+      if (sec === 'info') {
+        infoTabBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-white bg-purple-900/60 transition';
+        secTabBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+        infoForm.classList.remove('hidden');
+        secForm.classList.add('hidden');
+      } else {
+        secTabBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-white bg-purple-900/60 transition';
+        infoTabBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+        secForm.classList.remove('hidden');
+        infoForm.classList.add('hidden');
+      }
+    }
+
+    function saveProfileInfo(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      currentUser.zodiac = document.getElementById('profile-zodiac-select').value;
+      currentUser.bio = document.getElementById('profile-bio-input').value;
+
+      alert('Profil bilgileriniz ve biyografiniz başarıyla güncellendi!');
+      closeProfileModal();
+    }
+
+    function changeUserPassword(e) {
+      e.preventDefault();
+      const newPass = document.getElementById('pass-new').value;
+      const confirmPass = document.getElementById('pass-confirm').value;
+
+      if (newPass !== confirmPass) {
+        alert('Yeni şifreler eşleşmiyor! Lütfen tekrar kontrol edin.');
+        return;
+      }
+
+      alert('Şifreniz başarıyla değiştirildi.');
+      document.getElementById('pass-current').value = '';
+      document.getElementById('pass-new').value = '';
+      document.getElementById('pass-confirm').value = '';
+      closeProfileModal();
+    }
+
+    // --- Starfield Canvas ---
+    function initStarfield() {
+      const canvas = document.getElementById('star-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      const stars = Array.from({ length: 100 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        size: Math.random() * 1.5 + 0.5,
+        alpha: Math.random(),
+        speed: Math.random() * 0.01 + 0.003
+      }));
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        stars.forEach(star => {
+          star.alpha += star.speed;
+          if (star.alpha > 1 || star.alpha < 0) star.speed = -star.speed;
+          ctx.fillStyle = `rgba(223, 177, 91, ${Math.abs(star.alpha) * 0.7})`;
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    // --- Tab Switcher ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const activeTab = document.getElementById(`tab-${tabId}`);
+      if (activeTab) activeTab.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-purple-900/50', 'border', 'border-purple-500/30', 'text-white');
+        btn.classList.add('text-slate-300');
+      });
+      const navBtn = document.getElementById(`nav-${tabId}`);
+      if (navBtn) navBtn.classList.add('active', 'bg-purple-900/50', 'border', 'border-purple-500/30', 'text-white');
+      
+      lucide.createIcons();
+    }
+
+    // --- Horoscope Grid ---
+    function renderZodiacGrid() {
+      const container = document.getElementById('zodiac-grid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      zodiacData.forEach((z, idx) => {
+        const item = document.createElement('div');
+        item.className = `glass-card p-3 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition text-center ${idx === 0 ? 'border-amber-400/60 bg-purple-900/30' : ''}`;
+        item.onclick = () => {
+          document.getElementById('selected-zodiac-icon').innerText = z.symbol;
+          document.getElementById('selected-zodiac-name').innerText = `${z.name} Burcu`;
+          document.getElementById('selected-zodiac-date').innerText = z.date;
+          document.getElementById('zodiac-main-text').innerText = z.main;
+        };
+        item.innerHTML = `
+          <span class="text-2xl mb-1">${z.symbol}</span>
+          <span class="font-semibold text-xs text-slate-100">${z.name}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // --- Tarot ---
+    function setTarotSpread(count) {
+      currentSpreadCount = count;
+      resetTarotDeck();
+    }
+
+    function resetTarotDeck() {
+      selectedTarotCards = [];
+      document.getElementById('tarot-reading-result').classList.add('hidden');
+      const container = document.getElementById('tarot-cards-container');
+      container.innerHTML = '';
+
+      for (let i = 0; i < currentSpreadCount; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'perspective-1000 h-72 cursor-pointer group';
+        slot.onclick = () => revealTarotCard(slot, i);
+        slot.innerHTML = `
+          <div class="card-inner relative w-full h-full transform-style-3d rounded-2xl">
+            <div class="backface-hidden absolute inset-0 bg-gradient-to-b from-purple-950 to-obsidian border-2 border-amber-500/30 rounded-2xl flex flex-col items-center justify-center p-4">
+              <span class="text-amber-400 text-2xl mb-2">🔮</span>
+              <span class="text-xs text-amber-300">Kör Kart</span>
+            </div>
+            <div class="backface-hidden rotate-y-180 absolute inset-0 glass-panel border-2 border-amber-400 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
+              <span class="card-icon text-3xl">✨</span>
+              <span class="card-title font-serif font-bold text-sm gold-gradient-text mt-2">--</span>
+              <span class="card-desc text-[11px] text-slate-300 mt-1">--</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(slot);
+      }
+    }
+
+    function revealTarotCard(cardElem, index) {
+      if (selectedTarotCards[index]) return;
+      const randomCard = tarotDeckData[Math.floor(Math.random() * tarotDeckData.length)];
+      selectedTarotCards[index] = randomCard;
+
+      const inner = cardElem.querySelector('.card-inner');
+      inner.querySelector('.card-icon').innerText = randomCard.icon;
+      inner.querySelector('.card-title').innerText = randomCard.name;
+      inner.querySelector('.card-desc').innerText = randomCard.meaning;
+      inner.classList.add('rotate-y-180');
+
+      if (selectedTarotCards.filter(Boolean).length === currentSpreadCount) {
+        setTimeout(() => {
+          document.getElementById('tarot-reading-result').classList.remove('hidden');
+        }, 500);
+      }
+    }
+
+    // --- Coffee Analysis ---
+    function handleCoffeeImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          document.getElementById('upload-placeholder').classList.add('hidden');
+          const container = document.getElementById('coffee-preview-container');
+          container.classList.remove('hidden');
+          document.getElementById('coffee-preview-img').src = evt.target.result;
+          const btn = document.getElementById('btn-analyze-coffee');
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function analyzeCoffee() {
+      const scanner = document.getElementById('scanner-line');
+      scanner.classList.remove('hidden');
+      setTimeout(() => {
+        scanner.classList.add('hidden');
+        document.getElementById('coffee-result-container').innerHTML = `
+          <div class="space-y-3 animate-fadeIn">
+            <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+              Algılanan Motifler: Kuş, Yürek Ferahlığı, Açık Yol
+            </div>
+            <p>Fincanınızdaki telveler yüreğinizdeki sıkıntıların hafifleyeceğini müjdeliyor. Yakında sevindirici bir haber veya yolculuk gündeme gelebilir.</p>
+          </div>
+        `;
+      }, 2000);
+    }
+
+    // --- AI Chat ---
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const chatContainer = document.getElementById('chat-messages');
+      chatContainer.innerHTML += `
+        <div class="flex items-start justify-end gap-3">
+          <div class="bg-gradient-to-r from-purple-700 to-indigo-600 p-3 rounded-2xl text-white text-xs">
+            ${val}
+          </div>
+        </div>
+      `;
+      input.value = '';
+
+      setTimeout(() => {
+        chatContainer.innerHTML += `
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-full bg-purple-900/60 border border-purple-500/30 flex items-center justify-center text-amber-300 text-xs">🤖</div>
+            <div class="glass-card p-3 rounded-2xl text-slate-200 text-xs">
+              Gökyüzünün enerjileri bu soru için derin bir sezgiselliğe işaret ediyor. İç sesinize güvenin.
+            </div>
+          </div>
+        `;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 700);
+    }
+
+    function clearChat() {
+      document.getElementById('chat-messages').innerHTML = '';
+    }
+
+    // --- Universal Modals ---
+    function openModal(title, html) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-body').innerHTML = html;
+      document.getElementById('universal-modal').classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeModal() {
+      document.getElementById('universal-modal').classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function openTokenModal() {
+      document.getElementById('token-modal').classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeTokenModal() {
+      document.getElementById('token-modal').classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function addTokens(amt) {
+      userTokens += amt;
+      document.getElementById('token-count').innerText = `${userTokens} Kredi`;
+    }
+
+    function calculateBirthChart(e) {
+      e.preventDefault();
+      const name = document.getElementById('chart-name').value;
+      document.getElementById('chart-display-title').innerText = `${name} - Doğum Haritası`;
+    }
+
+    function showPlanetInfo(p, pos, house, desc) {
+      openModal(`${p} (${pos})`, `<p><strong>Ev:</strong> ${house}</p><p>${desc}</p>`);
+    }
+
+    function fillBirthChartPreset(name, date, time, loc) {
+      document.getElementById('chart-name').value = name;
+      document.getElementById('chart-date').value = date;
+      document.getElementById('chart-time').value = time;
+      document.getElementById('chart-location').value = loc;
+    }
+
+    // Initializer
+    window.addEventListener('DOMContentLoaded', () => {
+      initStarfield();
+      renderZodiacGrid();
+      setTarotSpread(3);
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
